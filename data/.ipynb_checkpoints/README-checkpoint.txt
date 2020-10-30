@@ -1,1 +1,0 @@
-All camera captures and driving logs go here.

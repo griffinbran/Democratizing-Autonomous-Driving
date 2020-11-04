@@ -6,7 +6,7 @@
   Questions to be explored:
 > 1. Point 1...
 > 2. Point 2...
-> 3. Point 3...
+> 3. What is a reasonable 'optical cue'?
 <br>
 ---
 ### Overview
@@ -14,10 +14,10 @@
 This DSI module covers:
 
 - Machine Learning for Deep Neural Networks (TensorFlow, Keras API)
-- Cloud Coumputing with a GPU (Google Colaboratory...)
-- Computer Vision ( image processing, image formation, feature detection, computational photography)
-- Convolutional Neural Networks (regularization, hypertuning, ...)
-- What else???
+- Cloud Coumputing with a GPU (Google Colaboratory, CNN implementation with parallel processing)
+- Computer Vision ( RGB image processing, image formation, feature detection, computational photography)
+- Convolutional Neural Networks (regularization, automated pattern recognition, )
+- Intelligent autonomous systems (self-driving cars)
 
 ### Contents
 
@@ -33,9 +33,11 @@ This DSI module covers:
 ### Background
 
 Here is some background info:
-> * 
-> *
-> *
+> * Captured human steering angles are mapped to raw pixels, from timestamped video data, by CNNs to generate proposed steering commands
+> * End-to-End learning: Automated detection of useful road features, no explicit decomposition of processing pipeline such as path planning or control
+> * unpaved roads, without lane markings (or lane detection/guard rails/other cars), minimum data from humans
+> * No "human-selected intermediate criteria", system performance over human interpretation
+> * Training: Desired sterring commands = y_true, Proposed steering commands = y_pred, compute error --> Back propagated weight adjustment
 
 ### Data Dictionary
 
@@ -46,6 +48,10 @@ Here is some background info:
 |---|---|---|---|---|
 |**variable1**|*dtype*|Origin of Data|*Category*|*Description*|
 |**variable2**|*dtype*|Origin of Data|*Category*|*Description*|
+|**IMAGE_HEIGHT**|*int*|utils.py|*Global Variable*|*160(pixels)-Vertical units across: Top=0 to Bottom= 159*|
+|**IMAGE_WIDTH**|*int*|utils.py|*Global Variable*|*320(pixels)-Horizontal units across: Left=0 to Right= 319*|
+|**IMAGE_CHANNELS**|*int*|utils.py|*Global Variable*|*3-RGB Channels*|
+|**INPUT_SHAPE**|*3-tuple*|utils.py|*Global Variable*|*(IMAGE_HEIGHT, IMAGE_WIDTH, IMAGE_CHANNELS)*|
 
 ---
 <a id='data_aquisition_and_cleaning'></a>
@@ -66,9 +72,46 @@ Here is some background info:
 
 #### Training the CNN
 
-> * 10/29/2020 Discuss training ...
+> * Network architecture: 9 layers, 5 convolution layers, 3 fully connected layers
 > * and then..
-> * and then...
+> * 
+
+def build_model(args):
+    """
+    NVIDIA model used
+    Image normalization to avoid saturation and make gradients work better.
+    Convolution: 5x5, filter: 24, strides: 2x2, activation: ELU
+    Convolution: 5x5, filter: 36, strides: 2x2, activation: ELU
+    Convolution: 5x5, filter: 48, strides: 2x2, activation: ELU
+    Convolution: 3x3, filter: 64, strides: 1x1, activation: ELU
+    Convolution: 3x3, filter: 64, strides: 1x1, activation: ELU
+    Drop out (0.5)
+    Fully connected: neurons: 100, activation: ELU
+    Fully connected: neurons: 50, activation: ELU
+    Fully connected: neurons: 10, activation: ELU
+    Fully connected: neurons: 1 (output)
+
+    # the convolution layers are meant to handle feature engineering
+    the fully connected layer for predicting the steering angle.
+    dropout avoids overfitting
+    ELU(Exponential linear unit) function takes care of the Vanishing gradient problem. 
+    """
+    model = Sequential()
+    model.add(Lambda(lambda x: x/127.5-1.0, input_shape=INPUT_SHAPE))
+    model.add(Conv2D(24, 5, 5, activation='elu', subsample=(2, 2)))
+    model.add(Conv2D(36, 5, 5, activation='elu', subsample=(2, 2)))
+    model.add(Conv2D(48, 5, 5, activation='elu', subsample=(2, 2)))
+    model.add(Conv2D(64, 3, 3, activation='elu'))
+    model.add(Conv2D(64, 3, 3, activation='elu'))
+    model.add(Dropout(args.keep_prob))
+    model.add(Flatten())
+    model.add(Dense(100, activation='elu'))
+    model.add(Dense(50, activation='elu'))
+    model.add(Dense(10, activation='elu'))
+    model.add(Dense(1))
+    model.summary()
+
+    return model
 
 ---
 <a id='exploratory_analysis'></a>
@@ -125,6 +168,12 @@ External Resources:
 * [`naokishibuya/car-behavioral-cloning`] (GitHub): ([*source*](https://github.com/naokishibuya/car-behavioral-cloning))
 * [`llSourcell/How_to_simulate_a_self_driving_car`] (GitHub): ([*source*](https://github.com/llSourcell/How_to_simulate_a_self_driving_car))
 
+Papers:
+* `End-to-End Deep Learning for Self-Driving Cars` (NVIDIA Developer Blog): ([*source*](https://developer.nvidia.com/blog/deep-learning-self-driving-cars/))
+* `Explaining How End-to-End Deep Learning Steers a Self-Driving Car` (NVIDIA Developer Blog): ([*source*](https://developer.nvidia.com/blog/explaining-deep-learning-self-driving-car/))
+* `End to End Learning for Self-Driving Cars` (arXiv): ([*source*](https://arxiv.org/pdf/1604.07316v1.pdf))
+* `VisualBackProp: efficient visualization of CNNs` (arXiv): ([*source*](https://arxiv.org/pdf/1611.05418.pdf))
+
 ### Contact:
 
 > * Anthony Clemens ([GitHub](https://git.generalassemb.ly/ajclemens) | [LinkedIn](https://www.linkedin.com/in/anthony-clemens/))
@@ -134,7 +183,6 @@ External Resources:
 Project Link: ([*source*](https://git.generalassemb.ly/cloudmcloudyo/optimizing-self-driving/blob/master/README.md))
 
 ---
-***REMINDERS- DELETE BEFORE SUBMITTING***
 ### Submission
 
 **Materials must be submitted by 4:59 PST on Friday, November 13, 2020.**

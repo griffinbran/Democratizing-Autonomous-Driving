@@ -41,7 +41,7 @@ def telemetry(sid, data):
         # Increase throttle when speed falls below 20mph (esp useful for track 2)
         throttle = 0.2 if float(speed) > 20 else 0.5
         
-        print(steering_angle, throttle)
+        print(steering_angle, throttle, speed)
         send_control(steering_angle, throttle)
 
         # save frame

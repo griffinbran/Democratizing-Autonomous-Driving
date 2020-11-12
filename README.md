@@ -1,55 +1,129 @@
-# ![](https://ga-dash.s3.amazonaws.com/production/assets/logo-9f88ae6c9c3871690e33280fcf557f33.png) Optimizing Autonomous Driving
+# ![](https://ga-dash.s3.amazonaws.com/production/assets/logo-9f88ae6c9c3871690e33280fcf557f33.png) Democratizing Autonomous Driving
 ---
 ### Problem Statement
-***TO DO***
+The existing self-driving car market is dominated by multi-billion dollar companies such as Alphabet, Tesla, Ford etc. Perceived barriers to entry include high costs, access to data, and technicality. A market with only big companies will result in monopoly/oligopoly where a few companies get to decide the price of the product, not the supply and demand relation. Consumers suffer greatly from monopoly as they don't have other options. In an effort to prevent this situation from happening, we would like to build a self-driving car model from scratch based on convolutional neural networks to showcase that self-driving is not as beyond reach for smaller companies, or even startups. In fact, it is possible to build a well-performed self-driving car model with relative small datasets, simple hardware requirement and a straightforward process. By doing this, we hope that more company executives will join the wave of self-driving rather than sit back and be the observants.
 
-  Questions to be explored:
-> 1. Point 1...
-> 2. Point 2...
-> 3. Point 3...
-<br>
+  We will be exploring the following specific questions:
+1. Can we train a model using convolutional neural network(CNN) to keep the car in the lane and finish a track?
+2. Can we optimize the model to make the car drive more like a human (more smoothly), rather than swerve in the lane?
+3. Can we optimize the model to drive as fast as it could while still stay in the lane?
+4. Can we use a smaller dataset to achieve similar results as big datasets?
+5. Can we break through the hardware limitations of smaller companies?
+
 ---
-### Overview
-
-This DSI module covers:
-
-- Machine Learning for Deep Neural Networks (TensorFlow, Keras API)
-- Cloud Coumputing with a GPU (Google Colaboratory...)
-- Computer Vision ( image processing, image formation, feature detection, computational photography)
-- Convolutional Neural Networks (regularization, hypertuning, ...)
-- What else???
 
 ### Contents
 
-* [Background](#background)
 * [Data Aquisition & Cleaning](#data_aquisition_and_cleaning)
-* [Exploratory Analysis](#exploratory_analysis)
+* [Exploratory Data Analysis](#exploratory_data_analysis)
+* [Image Preprocessing & Augmentation](#image_preprocessing_&_augmentation)
+* [Modeling and Tuning](#modeling_and_tuning)
+* [Evaluation](#evaluation)
 * [Findings and Recommendations](#findings_and_recommendations)
-* [Next Steps](#next_steps)
+* [Limitations and Next Steps](#limitations_and_next_steps)
+* [Technical Log](#technical_log)
 * [Software Requirements](#software_requirements)
 * [Acknowledgements and Contact](#acknowledgements_and_contact)
----
-<a id='background'></a>
-### Background
-
-Here is some background info:
-> * 
-> *
-> *
-
-### Data Dictionary
-
-**NOTE: Make sure you cross-reference your data with your data sources to eliminate any data collection or data entry issues.**<br>
-*See [Acknowledgements and Contact](#acknowledgements_and_contact) section for starter code resources*<br>
-
-|Feature|Type|Dataset|Category|Description|
-|---|---|---|---|---|
-|**variable1**|*dtype*|Origin of Data|*Category*|*Description*|
-|**variable2**|*dtype*|Origin of Data|*Category*|*Description*|
 
 ---
 <a id='data_aquisition_and_cleaning'></a>
 ### Data Aquisition & Cleaning
+
+We luckily found a driving simulator open sourced by Udacity which allows us easily collect data. Once we hit record button, we can control the car with WASD keyboard and the simulator will automatically generate a driving log which records images captured by three cameras placed left, center and right at the car front and the WASD inputs. In order to validate our hypothesis that even with smaller datasets, we can still build a well-performed model with CNN, we fed into our model with two different datasets: Udacity-released datasets which has over 9,000 rows of data and a self-generated dataset with only 1300+ rows. 
+
+Thanks to the auto-generated driving log, there are not much data cleaning for us to do except for adding the columns for data and align the file path for the camera captures.
+
+---
+<a id='exploratory_data_analysis'></a>
+### Exploratory Data Analysis
+
+The EDA is based only on the Udacity-released dataset.
+
+The mean of steering angles is 0, with standard deviation of 0.16. We could tell that the data does not have big spread, which makes sense as too much steering should not be expected on a gentle track. The distribution of steering angles shows that 0 steering angle is the abosolute most frequent number, which confirms that the track requires mostly straight driving. A breakdown of the counts of steering angles per direction indicate that there are more left turns than right turns, which means the dataset would be baised to favorleft turns than right turns. Also, as going straight is the aboslute majority, driving straight would also be preferred. To mitigate these issues, image augmentation should be counsidered to use on our datasets, for i.e.: we should consider filp the images to create a more balanced set between turns. And limit the number of zero steerings in the sample. 
+
+<img src='./charts/dist_of_steering_angles.png' style="float: left; width: 500px;"/>                   
+<img src='./charts/count_of_steering.png' style="float:left; width: 500px;"/>
+
+
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+
+By exploring the captured images from the three cameras, we found that the images from the center camera have in fact contained all the information that left and right cameras have captured. Therefore we believe the images from the center camera should be sufficient to be the only input. However, images captured from left and right could serve as our assitance in correcting the steering of the car in case it goes off center. So we would also include those images, only to adjust the steering angles accordingly with a correction angle. 
+
+Furthermore, the original images contain irrelevant info such as sky, grass and car front which are noise rather than signal for the model. We therefore decided to crop those out of the images before feeding them into the convolutional neural networks.
+
+![](./charts/neg_steer.png)
+![](./charts/zero_steer.png)
+![](./charts/pos_steer.png)
+
+---
+<a id='image_preprocessing_&_augmentation'></a>
+### Image Preprocessing & Augmentation
+
+To improve the quality of the data, image preprocessing and augmentation are applied. The preprocessing include cropping, resizing and converting the color space. Take cropping as an example, each image contains information irrelevant to the problem at hand, e.g. the sky, background, trees, hood of the car. The images are thus cropped to avoid feeding the neural network this superfluous information. Below is an example of how the images look after being cropped:
+
+<img src='./charts/before_after/before.png' style="float: left; width: 500px;"/>                   
+<img src='./charts/before_after/after_crop.png' style="float:left; width: 500px;"/>
+
+
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+
+
+During model training, images are also augmented in the way of random flip, translation, shadow, or brighten transformation. Augmentation of this sort creates a more robust model that is less overfit on the training set, as we are artificially introducing variance into the training.
+
+Below are the examples of images to which random flip was applied:
+
+<img src='./charts/before_after/after_flip.png' style="width: 500px;"/>                   
+
+
+Examples of images to which random brightness was applied:
+
+<img src='./charts/before_after/after_brightness.png' style="width: 1000px;"/>                   
+
+Examples of images to which random shadow was applied:
+
+<img src='./charts/before_after/after_shadow.png' style="width: 1000px;"/>  
+
+
+---
+
+<a id='modeling_and_tuning'></a>
+### Modeling and Tuning
+
+Our model is based on the NVIDIA model which explores the possibility of using only CNN regression.
+
+Baseline Model
+
+Best Model
+
+
+---
+
+<a id='evaluation'></a>
+### Evaluation
+
+
+
+
+
+---
+<a id='findings_and_recommendations'></a>
+### Findings and Recommendations
+
+  Answer the problem statement:
+> 1. Point 1...
+> 2. Point 2...
+> 3. Point 3...
+
+---
+<a id='limitations_and_next_steps'></a>
+### Limitations and Next Steps
+
+Limitations:
+Next Steps:
+
+---
+<a id='technical_log'></a>
+### Technical Log:
 #### Cloning and Debugging
 
 > * 10/27/2020 Pre-trained simulator is downloaded and run. First data collection.
@@ -71,46 +145,6 @@ Here is some background info:
 > * and then...
 
 ---
-<a id='exploratory_analysis'></a>
-### Exploratory Analysis
-
-> * Insert EDA details...
-> *
-> *
-
-**Data Cleaning and EDA**
-- Does the student fix data entry issues?
-- Are data appropriately labeled?
-- Are data appropriately typed?
-- Are datasets combined correctly?
-- Are appropriate summary statistics provided?
-- Are steps taken during data cleaning and EDA framed appropriately?
-
-### Data Visualization
-
-> * Make some pretty plots with Tableau:
-
-**Visualizations**
-- Are the requested visualizations provided?
-- Do plots accurately demonstrate valid relationships?
-- Are plots labeled properly?
-- Plots interpreted appropriately?
-- Are plots formatted and scaled appropriately for inclusion in a notebook-based technical report?
-
----
-<a id='findings_and_recommendations'></a>
-### Findings and Recommendations
-
-  Answer the problem statement:
-> 1. Point 1...
-> 2. Point 2...
-> 3. Point 3...
-
----
-<a id='next_steps'></a>
-### Next Steps:
-
----
 <a id='software_requirements'></a>
 ### Software Requirements:
 
@@ -124,19 +158,3 @@ External Resources:
 * [`udacity/self-driving-car-sim`] (GitHub): ([*source*](https://github.com/udacity/self-driving-car-sim))
 * [`naokishibuya/car-behavioral-cloning`] (GitHub): ([*source*](https://github.com/naokishibuya/car-behavioral-cloning))
 * [`llSourcell/How_to_simulate_a_self_driving_car`] (GitHub): ([*source*](https://github.com/llSourcell/How_to_simulate_a_self_driving_car))
-
-### Contact:
-
-> * Anthony Clemens ([GitHub](https://git.generalassemb.ly/ajclemens) | [LinkedIn](https://www.linkedin.com/in/anthony-clemens/))
-> * Cloudy Liu      ([GitHub](https://git.generalassemb.ly/cloudmcloudyo) | [LinkedIn](https://www.linkedin.com/in/cloudyliu/))
-> * Brandon Griffin ([GitHub](https://github.com/griffinbran) | [LinkedIn](https://www.linkedin.com/in/griffinbran/))
-
-Project Link: ([*source*](https://git.generalassemb.ly/cloudmcloudyo/optimizing-self-driving/blob/master/README.md))
-
----
-***REMINDERS- DELETE BEFORE SUBMITTING***
-### Submission
-
-**Materials must be submitted by 4:59 PST on Friday, November 13, 2020.**
-
----

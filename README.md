@@ -41,11 +41,10 @@ The EDA is based only on the Udacity-released dataset.
 
 The mean of steering angles is 0, with standard deviation of 0.16. We could tell that the data does not have big spread, which makes sense as too much steering should not be expected on a gentle track. The distribution of steering angles shows that 0 steering angle is the abosolute most frequent number, which confirms that the track requires mostly straight driving. A breakdown of the counts of steering angles per direction indicate that there are more left turns than right turns, which means the dataset would be baised to favorleft turns than right turns. Also, as going straight is the aboslute majority, driving straight would also be preferred. To mitigate these issues, image augmentation should be counsidered to use on our datasets, for i.e.: we should consider filp the images to create a more balanced set between turns. And limit the number of zero steerings in the sample. 
 
-<img src='./charts/dist_of_steering_angles.png' style="float: left; width: 500px;"/>                   
-<img src='./charts/count_of_steering.png' style="float:left; width: 500px;"/>
+<img src='./charts/dist_of_steering_angles.png' style="float: left; width: 375px;"/>                   
+<img src='./charts/count_of_steering.png' style="float:left; width: 375px;"/>
 
-
-<br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+<br><br>
 
 By exploring the captured images from the three cameras, we found that the images from the center camera have in fact contained all the information that left and right cameras have captured. Therefore we believe the images from the center camera should be sufficient to be the only input. However, images captured from left and right could serve as our assitance in correcting the steering of the car in case it goes off center. So we would also include those images, only to adjust the steering angles accordingly with a correction angle. 
 
@@ -65,7 +64,7 @@ To improve the quality of the data, image preprocessing and augmentation are app
 <img src='./charts/before_after/after_crop.png' style="float:left; width: 500px;"/>
 
 
-<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+<br><br>
 
 
 During model training, images are also augmented in the way of random flip, translation, shadow, or brighten transformation. Augmentation of this sort creates a more robust model that is less overfit on the training set, as we are artificially introducing variance into the training.

@@ -66,15 +66,15 @@ During model training, images are also augmented in the way of random flip, tran
 
 Below are the examples of images to which random flip was applied:
 
-<img src='./charts/before_after/after_flip.png' style="width: 375px;"/>                   
+<img src='./charts/before_after/after_flip.png' style="float: left; width: 375px;"/>                   
 
 Examples of images to which random brightness was applied:
 
-<img src='./charts/before_after/after_brightness.png' style="width: 1000px;"/>                   
+<img src='./charts/before_after/after_brightness.png' style="float: left; width: 1000px;"/>                   
 
 Examples of images to which random shadow was applied:
 
-<img src='./charts/before_after/after_shadow.png' style="width: 1000px;"/>  
+<img src='./charts/before_after/after_shadow.png' style="float: left; width: 1000px;"/>  
 
 ---
 
@@ -93,25 +93,44 @@ Best Model
 <a id='evaluation'></a>
 ### Evaluation
 
-
-
+We looked at MSE, Huber, and custom loss functions
+MSE and Huber models make it around the track with a speed limit
+Custom loss model drives more like a human but is still unable to make it around the track
+All of the models cannot make it around the track without the speed limit. Albeit, the MSE and Huber models have significantly more unstable swerving than the custom loss model
+Custom loss model stays on the track longer, and drives better with no speed limit than the other models.
 
 
 ---
 <a id='findings_and_recommendations'></a>
 ### Findings and Recommendations
 
-  Answer the problem statement:
-> 1. Point 1...
-> 2. Point 2...
-> 3. Point 3...
+CNN is successful in keeping the car in the lane with a speed limit.
+We were unable to construct a model that could complete a lap at full speed yet.
+Custom loss function successful in changing the behavior of the car to be more human-like but unsuccessful in completing a lap with or without a speed limit.
+A small amount of training data is still sufficient to train the model.
+Hardware limitation can be resolved by using a batch generator.
+CNN model is able to perform without lane marks
+
+
+Mid-sized car companies: don’t be afraid to enter the market to compete!
+Companies with long-haul, fixed routes who look to decrease the casualty of drivers due to fatigue driving/extreme road condition: this model could be very helpful.
+Companies who cannot afford to transform their fleets: could opt for self-driving detection devices using this model.
+
 
 ---
 <a id='limitations_and_next_steps'></a>
 ### Limitations and Next Steps
 
 Limitations:
+
+Due to the fact that our model is simply a regression model, the application of our model may be limited to predictable road conditions, such as driving on the highway in the midwest (interstate driving), rather than a traffic jam in LA (city driving).
+Due to the time limitations, we were not able to run too many epochs to test out if the model can generalize to other tracks. Even with GPU cloud computing, training times are long, ~40 min per epoch.
+
 Next Steps:
+
+1. Increase the epochs of training to evaluate the model performance on a different track
+2. Further augment the images to include different weather conditions
+3. Utilize transfer learning and experiment with more complex road conditions (city driving, change lanes, parking, etc)
 
 ---
 <a id='technical_log'></a>

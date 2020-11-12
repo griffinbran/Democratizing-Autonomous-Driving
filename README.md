@@ -42,9 +42,7 @@ The EDA is based only on the Udacity-released dataset.
 The mean of steering angles is 0, with standard deviation of 0.16. We could tell that the data does not have big spread, which makes sense as too much steering should not be expected on a gentle track. The distribution of steering angles shows that 0 steering angle is the abosolute most frequent number, which confirms that the track requires mostly straight driving. A breakdown of the counts of steering angles per direction indicate that there are more left turns than right turns, which means the dataset would be baised to favorleft turns than right turns. Also, as going straight is the aboslute majority, driving straight would also be preferred. To mitigate these issues, image augmentation should be counsidered to use on our datasets, for i.e.: we should consider filp the images to create a more balanced set between turns. And limit the number of zero steerings in the sample. 
 
 <img src='./charts/dist_of_steering_angles.png' style="float: left; width: 375px;"/>                   
-<img src='./charts/count_of_steering.png' style="float:left; width: 375px;"/>
-
-<br><br>
+<img src='./charts/count_of_steering.png' style="float:right; width: 375px;"/>
 
 By exploring the captured images from the three cameras, we found that the images from the center camera have in fact contained all the information that left and right cameras have captured. Therefore we believe the images from the center camera should be sufficient to be the only input. However, images captured from left and right could serve as our assitance in correcting the steering of the car in case it goes off center. So we would also include those images, only to adjust the steering angles accordingly with a correction angle. 
 
@@ -61,17 +59,14 @@ Furthermore, the original images contain irrelevant info such as sky, grass and 
 To improve the quality of the data, image preprocessing and augmentation are applied. The preprocessing include cropping, resizing and converting the color space. Take cropping as an example, each image contains information irrelevant to the problem at hand, e.g. the sky, background, trees, hood of the car. The images are thus cropped to avoid feeding the neural network this superfluous information. Below is an example of how the images look after being cropped:
 
 <img src='./charts/before_after/before.png' style="float: left; width: 500px;"/>                   
-<img src='./charts/before_after/after_crop.png' style="float:left; width: 500px;"/>
-
-
-<br><br>
+<img src='./charts/before_after/after_crop.png' style="float: right; width: 500px;"/>
 
 
 During model training, images are also augmented in the way of random flip, translation, shadow, or brighten transformation. Augmentation of this sort creates a more robust model that is less overfit on the training set, as we are artificially introducing variance into the training.
 
 Below are the examples of images to which random flip was applied:
 
-<img src='./charts/before_after/after_flip.png' style="width: 500px;"/>                   
+<img src='./charts/before_after/after_flip.png' style="width: 375px;"/>                   
 
 
 Examples of images to which random brightness was applied:

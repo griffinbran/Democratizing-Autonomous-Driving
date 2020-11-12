@@ -68,7 +68,6 @@ Below are the examples of images to which random flip was applied:
 
 <img src='./charts/before_after/after_flip.png' style="width: 375px;"/>                   
 
-
 Examples of images to which random brightness was applied:
 
 <img src='./charts/before_after/after_brightness.png' style="width: 1000px;"/>                   
@@ -76,7 +75,6 @@ Examples of images to which random brightness was applied:
 Examples of images to which random shadow was applied:
 
 <img src='./charts/before_after/after_shadow.png' style="width: 1000px;"/>  
-
 
 ---
 

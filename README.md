@@ -14,7 +14,6 @@ The existing autonomous vehicle market is dominated by multi-billion dollar comp
 
 ### Contents
 
-* [Background](#background)
 * [Data Aquisition & Cleaning](#data_aquisition_and_cleaning)
 * [Exploratory Data Analysis](#exploratory_data_analysis)
 * [Image Preprocessing & Augmentation](#image_preprocessing_&_augmentation)
@@ -26,25 +25,13 @@ The existing autonomous vehicle market is dominated by multi-billion dollar comp
 * [Software Requirements](#software_requirements)
 * [Acknowledgements and Contact](#acknowledgements_and_contact)
 
-
----
-<a id='background'></a>
-### Background
-
-Here is some background info:
-* Captured human steering angles are mapped to raw pixels, from timestamped video data, by CNNs to generate proposed steering commands
-* End-to-End learning: Automated detection of useful road features, no explicit decomposition of processing pipeline such as path planning or control
-* unpaved roads, without lane markings (or lane detection/guard rails/other cars), minimum data from humans
-* No "human-selected intermediate criteria", system performance over human interpretation
-* Training: Desired sterring commands = y_true, Proposed steering commands = y_pred, compute error --> Back propagated weight adjustment
-
 ---
 <a id='data_aquisition_and_cleaning'></a>
 ### Data Aquisition & Cleaning
 
-We luckily found a driving simulator open sourced by Udacity which allows us easily collect data. Once we hit record button, we can control the car with WASD keyboard and the simulator will automatically generate a driving log which records images captured by three cameras placed left, center and right at the car front and the WASD inputs. In order to validate our hypothesis that even with smaller datasets, we can still build a well-performed model with CNN, we fed into our model with two different datasets: Udacity-released datasets which has over 9,000 rows of data and a self-generated dataset with only 1300+ rows. 
+We luckily found a driving simulator open sourced by Udacity which allows us to easily collect data. Once the record button is pressed, we can control the car with WASD keyboard and the simulator will automatically generate a driving log which records images captured by three cameras placed left, center and right at the car front and the WASD inputs. In order to validate our hypothesis that even with smaller datasets, we can still build a well-performed model with CNN, we trained our model on two different datasets: Udacity-released datasets which has over 9,000 rows of data and a self-generated dataset with only 1300+ rows.
 
-Thanks to the auto-generated driving log, there are not much data cleaning for us to do except for adding the columns for data and align the file path for the camera captures.
+Thanks to the auto-generated driving log, there is not much data cleaning for us to do except for adding the columns to the data and fixing the file paths to cloud file paths.
 
 ---
 <a id='exploratory_data_analysis'></a>

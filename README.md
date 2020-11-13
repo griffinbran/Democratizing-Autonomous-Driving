@@ -14,6 +14,7 @@ The existing self-driving car market is dominated by multi-billion dollar compan
 
 ### Contents
 
+* [Background](#background)
 * [Data Aquisition & Cleaning](#data_aquisition_and_cleaning)
 * [Exploratory Data Analysis](#exploratory_data_analysis)
 * [Image Preprocessing & Augmentation](#image_preprocessing_&_augmentation)
@@ -25,6 +26,18 @@ The existing self-driving car market is dominated by multi-billion dollar compan
 * [Software Requirements](#software_requirements)
 * [Acknowledgements and Contact](#acknowledgements_and_contact)
 
+
+---
+<a id='background'></a>
+### Background
+
+Here is some background info:
+* Captured human steering angles are mapped to raw pixels, from timestamped video data, by CNNs to generate proposed steering commands
+* End-to-End learning: Automated detection of useful road features, no explicit decomposition of processing pipeline such as path planning or control
+* unpaved roads, without lane markings (or lane detection/guard rails/other cars), minimum data from humans
+* No "human-selected intermediate criteria", system performance over human interpretation
+* Training: Desired sterring commands = y_true, Proposed steering commands = y_pred, compute error --> Back propagated weight adjustment
+
 ---
 <a id='data_aquisition_and_cleaning'></a>
 ### Data Aquisition & Cleaning
@@ -32,6 +45,69 @@ The existing self-driving car market is dominated by multi-billion dollar compan
 We luckily found a driving simulator open sourced by Udacity which allows us easily collect data. Once we hit record button, we can control the car with WASD keyboard and the simulator will automatically generate a driving log which records images captured by three cameras placed left, center and right at the car front and the WASD inputs. In order to validate our hypothesis that even with smaller datasets, we can still build a well-performed model with CNN, we fed into our model with two different datasets: Udacity-released datasets which has over 9,000 rows of data and a self-generated dataset with only 1300+ rows. 
 
 Thanks to the auto-generated driving log, there are not much data cleaning for us to do except for adding the columns for data and align the file path for the camera captures.
+
+
+### Data Dictionary
+
+**NOTE: Make sure you cross-reference your data with your data sources to eliminate any data collection or data entry issues.**<br>
+*See [Acknowledgements and Contact](#acknowledgements_and_contact) section for starter code resources*<br>
+
+|Feature|Type|Dataset|Category|Description|
+|---|---|---|---|---|
+|**variable1**|*dtype*|Origin of Data|*Category*|*Description*|
+|**variable2**|*dtype*|Origin of Data|*Category*|*Description*|
+|**IMAGE_HEIGHT**|*int*|utils.py|*Global Variable*|*160(pixels)-Vertical units across: Top=0 to Bottom= 159*|
+|**IMAGE_WIDTH**|*int*|utils.py|*Global Variable*|*320(pixels)-Horizontal units across: Left=0 to Right= 319*|
+|**IMAGE_CHANNELS**|*int*|utils.py|*Global Variable*|*3-RGB Channels*|
+|**INPUT_SHAPE**|*3-tuple*|utils.py|*Global Variable*|*(IMAGE_HEIGHT, IMAGE_WIDTH, IMAGE_CHANNELS)*|
+|**Layer One**|*dtype*|Origin of Data|*Category*|*Description*|
+|**variable2**|*dtype*|Origin of Data|*Category*|*Description*|
+|**variable1**|*dtype*|Origin of Data|*Category*|*Description*|
+
+
+|**CNN Architecture**|*Kernel Size*|*neurons*|No. of Images|*Stride*|*Shape ( h x w x RGB )*|
+|---|---|---|---|---|---|
+|**Input Layer**|*None*|None|< sample size >|None|*( 160 x 320 x 3 )*|
+|**Convolution 01**|*( 5 x 5 )*|24|24|*( 2 x 2 )*|*(  78 x 158 x 3 )*|
+|**Convolution 02**|*( 5 x 5 )*|36|864|*( 2 x 2 )*|*(  37 x  77 x 3 )*|
+|**Convolution 03**|*( 5 x 5 )*|48|41,472|*( 2 x 2 )*|*(  16 x  36 x 3 )*|
+|**Convolution 04**|*( 3 x 3 )*|64|2,654,208|*None*|*(  37 x  77 x 3 )*|
+|**Convolution 05**|*( 3 x 3 )*|64|169,869,312|*None*|*(  16 x  36 x 3 )*|
+|**Dropout**|*None*|None|169,869,312|*None*|*(  16 x  36 x 3 )*|
+|**Flatten**|*None*|None|169,869,312|*None*|*(  16 x  36 x 3 )*|
+|**Dense 01**|*None*|100|169,869,312|*None*|*(  16 x  36 x 3 )*|
+|**Dense 02**|*None*|50|169,869,312|*None*|*(  16 x  36 x 3 )*|
+|**Dense 03**|*None*|10|169,869,312|*None*|*(  16 x  36 x 3 )*|
+|**Dense Output**|*None*|1|169,869,312|*None*|*(  16 x  36 x 3 )*|
+
+
+|**CNN Model**|*Split*|*Epoch*|*Loss*|*Accuracy*|
+|---|---|---|---|---|
+|**Bseline MSE**|*Training*|01|0.0316|0.3251|
+|**Bseline MSE**|*Validation*|01|0.0191|0.8220|
+|**Bseline MSE**|*Training*|02|0.0266|0.3248|
+|**Bseline MSE**|*Validation*|02|0.0205|0.8240|
+
+|**CNN Model**|*Split*|*Epoch*|*Loss*|*Accuracy*|
+|---|---|---|---|---|
+|**Huber Loss, $\delta$=0.2**|*Training*|01|0.0243|0.3254|
+|**Huber Loss, $\delta$=0.2**|*Validation*|01|0.0207|0.8245|
+|**Huber Loss, $\delta$=0.2**|*Training*|02|0.0131|0.3247|
+|**Huber Loss, $\delta$=0.2**|*Validation*|02|0.0097|0.8235|
+|**Huber Loss, $\delta$=0.4**|*Training*|01|0.0158|0.3252|
+|**Huber Loss, $\delta$=0.4**|*Validation*|01|0.0093|0.8227|
+|**Huber Loss, $\delta$=0.4**|*Training*|02|0.0133|0.3249|
+|**Huber Loss, $\delta$=0.4**|*Validation*|02|0.0103|0.8233|
+|**Huber Loss, $\delta$=0.6**|*Training*|01|0.0160|0.3252|
+|**Huber Loss, $\delta$=0.6**|*Validation*|01|0.0092|0.8225|
+|**Huber Loss, $\delta$=0.6**|*Training*|02|0.0135|0.3249|
+|**Huber Loss, $\delta$=0.6**|*Validation*|02|0.0103|0.8236|
+|**Huber Loss, $\delta$=0.8**|*Training*|01|0.0160|0.3252|
+|**Huber Loss, $\delta$=0.8**|*Validation*|01|0.0093|0.8213|
+|**Huber Loss, $\delta$=0.8**|*Training*|02|0.0135|0.3249|
+|**Huber Loss, $\delta$=0.8**|*Validation*|02|0.0099|0.8236|
+|**Huber Loss, $\delta$=1.0**|*Training*|02|0.0134|0.3248|
+|**Huber Loss, $\delta$=1.0**|*Validation*|02|0.0097|0.8235|
 
 ---
 <a id='exploratory_data_analysis'></a>
@@ -169,3 +245,17 @@ External Resources:
 * [`udacity/self-driving-car-sim`] (GitHub): ([*source*](https://github.com/udacity/self-driving-car-sim))
 * [`naokishibuya/car-behavioral-cloning`] (GitHub): ([*source*](https://github.com/naokishibuya/car-behavioral-cloning))
 * [`llSourcell/How_to_simulate_a_self_driving_car`] (GitHub): ([*source*](https://github.com/llSourcell/How_to_simulate_a_self_driving_car))
+
+Papers:
+* `End-to-End Deep Learning for Self-Driving Cars` (NVIDIA Developer Blog): ([*source*](https://developer.nvidia.com/blog/deep-learning-self-driving-cars/))
+* `Explaining How End-to-End Deep Learning Steers a Self-Driving Car` (NVIDIA Developer Blog): ([*source*](https://developer.nvidia.com/blog/explaining-deep-learning-self-driving-car/))
+* `End to End Learning for Self-Driving Cars` (arXiv): ([*source*](https://arxiv.org/pdf/1604.07316v1.pdf))
+* `VisualBackProp: efficient visualization of CNNs` (arXiv): ([*source*](https://arxiv.org/pdf/1611.05418.pdf))
+
+Contact:
+
+> * Anthony Clemens ([GitHub](https://git.generalassemb.ly/ajclemens) | [LinkedIn](https://www.linkedin.com/in/anthony-clemens/))
+> * Cloudy Liu      ([GitHub](https://git.generalassemb.ly/cloudmcloudyo) | [LinkedIn](https://www.linkedin.com/in/cloudyliu/))
+> * Brandon Griffin ([GitHub](https://github.com/griffinbran) | [LinkedIn](https://www.linkedin.com/in/griffinbran/))
+
+Project Link: ([*source*](https://git.generalassemb.ly/cloudmcloudyo/optimizing-self-driving/blob/master/README.md))

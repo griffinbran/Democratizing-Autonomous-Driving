@@ -91,27 +91,26 @@ Examples of images to which random shadow was applied:
 <a id='modeling_and_tuning'></a>
 ### Modeling and Tuning
 
-
 Our model architecture is based on [NVIDIA](https://arxiv.org/pdf/1604.07316v1.pdf) end-to-end self-driving model which contains 1 normlized layer, 5 convolutional layers, 1 flatten layer followed by 3 fully-connected neural network layers. We used this architecture with a dropout layer and fed it with the Udacity-released datasets to establish our baseline model. The baseline model stayed on the track for 26s before crashing. Multiple tunings were applied to improve the model as well as resolving hardware limitations, including building a batch generator.
 
 We then decided to switch to a self-generated dataset that is 1/6 the size of the Udacity datasets to see how the model will perform. We built our model upon [Naomi Shibuya](https://github.com/naokishibuya/car-behavioral-cloning)'s image preprocessing/ augmentation and batch generator with NVIDIA's model architecture with dropout layer. We also built a custom loss function to combat the swerving of the car on the track. As a result, the custom loss model did not swerve on the road as much as the Huber loss model. 
 
 Below is the architecture of our best model: 
 
-|**CNN Architecture**|*Kernel Size*|*neurons*|No. of Images|*Stride*|*Shape ( h x w x RGB )*|
+|**CNN Architecture**|*Kernel Size*|*Neurons*|Parameters|*Stride*|*Shape ( h x w x RGB )*|
 |---|---|---|---|---|---|
 |**Input Layer**|*None*|None|< sample size >|None|*( 160 x 320 x 3 )*|
-|**Convolution 01**|*( 5 x 5 )*|24|24|*( 2 x 2 )*|*(  78 x 158 x 3 )*|
-|**Convolution 02**|*( 5 x 5 )*|36|864|*( 2 x 2 )*|*(  37 x  77 x 3 )*|
-|**Convolution 03**|*( 5 x 5 )*|48|41,472|*( 2 x 2 )*|*(  16 x  36 x 3 )*|
-|**Convolution 04**|*( 3 x 3 )*|64|2,654,208|*None*|*(  37 x  77 x 3 )*|
-|**Convolution 05**|*( 3 x 3 )*|64|169,869,312|*None*|*(  16 x  36 x 3 )*|
-|**Dropout**|*None*|None|169,869,312|*None*|*(  16 x  36 x 3 )*|
-|**Flatten**|*None*|None|169,869,312|*None*|*(  16 x  36 x 3 )*|
-|**Dense 01**|*None*|100|169,869,312|*None*|*(  16 x  36 x 3 )*|
-|**Dense 02**|*None*|50|169,869,312|*None*|*(  16 x  36 x 3 )*|
-|**Dense 03**|*None*|10|169,869,312|*None*|*(  16 x  36 x 3 )*|
-|**Dense Output**|*None*|1|169,869,312|*None*|*(  16 x  36 x 3 )*|
+|**Convolution 01**|*( 5 x 5 )*|24|1824|*( 2 x 2 )*|*(  78 x 158 x 24 )*|
+|**Convolution 02**|*( 5 x 5 )*|36|21636|*( 2 x 2 )*|*(  37 x  77 x 36 )*|
+|**Convolution 03**|*( 5 x 5 )*|48|43248|*( 2 x 2 )*|*(  17 x  37 x 48 )*|
+|**Convolution 04**|*( 3 x 3 )*|64|27712|*None*|*(  15 x  35 x 64 )*|
+|**Convolution 05**|*( 3 x 3 )*|64|36928|*None*|*(  13 x  33 x 64 )*|
+|**Dropout**|*None*|None|0|*None*|*(  13 x  33 x 64 )*|
+|**Flatten**|*None*|None|0|*None*|*(  27456 )*|
+|**Dense 01**|*None*|100|2745700|*None*|*( 100 )*|
+|**Dense 02**|*None*|50|5050|*None*|*(  50 )*|
+|**Dense 03**|*None*|10|510|*None*|*(  10 )*|
+|**Dense Output**|*None*|1|11|*None*|*(  1 )*|
 
 ---
 
@@ -121,7 +120,7 @@ Below is the architecture of our best model:
 Several cost functions, such as MSE and Huber, were utilized in evaluation of the model. Notably, a custom loss function that penalizes swerving performed best on both straightways and small turns. Of the models we built, the Huber loss model was the best in the simulator with a speed limit, but was unstable without one. On the contrary, the custom loss model could not make it around the course with a speed limit, but lasted longer on the course without one. 
 
 <table><tr>
-<td><img src='./charts/huber_loss_per_epoch.png' alt="Drawing" style="width: 500px;"/></td>               
+<td><img src='./charts/huber_loss_per_epoch.png' alt="Drawing" style="width: 500px;"/></td>             
 </tr></table>
 
 Above is the loss of train and test data over epoch for our best model. Interestingly, our training didn't converge after 15 epochs, although our model was already good enough to make the car finish the lap. However, this may indicate that if we run the model with more epochs, it would perform even better. We was unable to do so within the time restraint but would love to look into that in our next step. 
@@ -136,18 +135,13 @@ We also explored in details how our data were transformed by the filter layters 
 <a id='findings_and_recommendations'></a>
 ### Findings and Recommendations
 
-CNN is successful in keeping the car in the lane with a speed limit.
-A small amount of training data is still sufficient to train the model.
-We were unable to optimize the model to complete a lap at full speed yet.
-Hardware limitation can be resolved by using a batch generator.
-Recorded measurements of actual steering angles are mapped to raw pixels, from timestamped video data, by CNNs to generate proposed steering commands
-Training: Desired steering commands = y_true, Proposed steering commands = y_pred, compute error --> Back propagated weight adjustment
+We found that the current architecture of the CNN is successful in keeping the car in the lane as long as a speed limit is enforced. Remarkably, without lane marks, the CNN model is able to perform well enough with a Huber Loss Function to complete an entire lap with a limited amount of training data. Less than 30 minutes of human generated data, consisting of recorded steering angles and camera images, was enough to simulate autonomous driving. Hardware limitations can be resolved by making use of a batch generator such that data is partitioned to the GPU for parallel processing with the CPU. Capital expenditure on reasearch and development is reduced by accelerating and offloading work to a GPU with a batch generator. The cost of an entry level workstation GPU to perform the job of training is less than $350, while the cost of cloud computing with a comparable GPU is less than $75 for 40 hours of training. These options are preferrable as one epoch of training without the generator took nearly four hours and would require additional training data. In contrast, an observed average of only 40 minutes per epoch was required when making use of additional GPU processing power.
 
+In conclusion, we strongly recommend that mid-sized car companies be not intimidated to compete within the auto-tech market!
 
+Construction of a model capable of lap completion at full speed requires additional training, however, progress was made in the limited amount of time available for this project. A custom loss function, successful in suppressing the swerving behavior of the car, may be capable of completing an entire lap when combined with the Huber loss. The current training parameters did not provide an opportunity to test the performance of the model for robustness. Our observations suggest that the performance of the model stands to improve by training the model in a variety of conditions such as, augmenting extreme weather conditions, training on multiple tracks, and taking advantage of of pre-trained models by performing transfer learning.
 
-Mid-sized car companies: don’t be afraid to enter the market to compete!
-Companies with long-haul, fixed routes who look to decrease the casualty of drivers due to fatigue driving/extreme road condition: this model could be very helpful.
-Companies who cannot afford to transform their fleets: could opt for self-driving detection devices using this model.
+Companies with long-haul trip durations and wide-open travel routes are capable of taking advantage of this simple model as is. As a useful driving co-pilot, this model could be deployed as an inexpensive accident averting detection device. This would be a useful instrument in all autos, but for long roadtrips where fatigue related fatalities are a consideration it has the potential to save lives.
 
 ---
 <a id='limitations_and_next_steps'></a>
@@ -169,7 +163,6 @@ For our next steps, we would like to first increase the epochs of training. We b
 > * 10/27/2020 Pre-trained simulator is downloaded and run. First data collection.
 > * 10/28/2020 An updated version of Keras and a dated starter code lead to a rocky start full of error messages.
 > * 10/28/2020 After no success working in a virtual enviornment, Anthony brute force debugs *model.py* and *utils.py* from outdated dependencies.
-> * and then...
 
 #### Cloud Computing with GPU
 
@@ -183,7 +176,11 @@ For our next steps, we would like to first increase the epochs of training. We b
 ### Software Requirements:
 The simulator could be downloaded in Udacity's [repo](https://github.com/udacity/self-driving-car-sim). We used the term 3 version 1 to collect our data and test run our model. However as far as we are concerned, the version of the simulator listed in the repo doesn't affect the data collection and model performance.
 
-A virtual environment of Python 3.7 is recommended to run the drive.py. A environment.yml file is also attached under /assets folder in the repo for reader's convenience.
+A virtual environment of Python 3.7 was used to run the codes and affiliated files. The virtual environment is provided under `./assets` folder as `environment.yml` for reader's convenience. It can be installed and activated by the following commands:
+
+`conda env create --file environments.yml`
+
+`conda activate py37`
 
 ---
 <a id='acknowledgements_and_contact'></a>

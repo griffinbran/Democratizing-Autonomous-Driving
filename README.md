@@ -167,11 +167,11 @@ Companies with long-haul trip durations and wide-open travel routes are capable 
 ## Limitations and Next Steps
 [Back to Top](#back_to_top)
 
-Limitations:
+### Limitations:
 
 Due to the simplistic nature of design, the application of our regression model may be limited in scope to open roadways clear of restrictions. In particular, the task of remote highway driving is much better suited for our self-driving model than is navigating through rush hour traffic in a large urban metropolis. Additionally, training times were long with the CNN and even, with a batch generator partitioning the data to the GPU, the accelerated workload ran about 40 minutes an epic. Due to the time constraints, we were not able to train enough to test whether the model could generalize to other tracks or not. This could be addressed with additional processing power.
 
-Next Steps:
+### Next Steps:
 
 For our next steps, we would like to first increase the epochs of training. We believe this will improve our model's performance and are interested find if this could enable our model to generalize to a new track that has not been exposed to the model; We would also like to further augment the images to include different weather conditions so that the model can be generalized even more; Last but not least, to make our model more competitive, we would like to take advantage of pre-trained models and experiment with more complex road conditions such as city driving, change lanes, parking, etc to see if a CNN model could still hold. 
 
@@ -181,13 +181,13 @@ For our next steps, we would like to first increase the epochs of training. We b
 ## Technical Log:
 [Back to Top](#back_to_top)
 
-### Cloning and Debugging
+### Cloning and Debugging:
 
 > * 10/27/2020 Pre-trained simulator is downloaded and run. First data collection.
 > * 10/28/2020 An updated version of Keras and a dated starter code lead to a rocky start full of error messages.
 > * 10/28/2020 After no success working in a virtual enviornment, Anthony brute force debugs *model.py* and *utils.py* from outdated dependencies.
 
-### Cloud Computing with GPU
+### Cloud Computing with GPU:
 
 > * 10/28/2020 Anthony attempted running *model.py* on his local machine and reported 2-3 hours per epoch. The workload clearly needs to be shifted for reduced computation time as well as for practical reasons.
 > * 10/28/2020 Cloudy successfully imports *utils.py* to the cloud --> from utils import INPUT_SHAPE, batch_generator, and we successfully upload *model.py* in Google Colaboratory. 
@@ -214,19 +214,19 @@ A virtual environment of Python 3.7 was used to run the codes and affiliated fil
 ## Acknowledgements and Contact:
 [Back to Top](#back_to_top)
 
-External Resources:
+### External Resources:
 * [`How to Simulate a Self-Driving Car`] (YouTube): ([*source*](https://www.youtube.com/watch?v=EaY5QiZwSP4&t=1209s))
 * [`udacity/self-driving-car-sim`] (GitHub): ([*source*](https://github.com/udacity/self-driving-car-sim))
 * [`naokishibuya/car-behavioral-cloning`] (GitHub): ([*source*](https://github.com/naokishibuya/car-behavioral-cloning))
 * [`llSourcell/How_to_simulate_a_self_driving_car`] (GitHub): ([*source*](https://github.com/llSourcell/How_to_simulate_a_self_driving_car))
 
-Papers:
+### Papers:
 * `End-to-End Deep Learning for Self-Driving Cars` (NVIDIA Developer Blog): ([*source*](https://developer.nvidia.com/blog/deep-learning-self-driving-cars/))
 * `Explaining How End-to-End Deep Learning Steers a Self-Driving Car` (NVIDIA Developer Blog): ([*source*](https://developer.nvidia.com/blog/explaining-deep-learning-self-driving-car/))
 * `End to End Learning for Self-Driving Cars` (arXiv): ([*source*](https://arxiv.org/pdf/1604.07316v1.pdf))
 * `VisualBackProp: efficient visualization of CNNs` (arXiv): ([*source*](https://arxiv.org/pdf/1611.05418.pdf))
 
-Contact:
+### Contact:
 
 > * Cloudy Liu      ([GitHub](https://git.generalassemb.ly/cloudmcloudyo) | [LinkedIn](https://www.linkedin.com/in/cloudyliu/))
 > * Brandon Griffin ([Twitter](https://twitter.com/GriffinBran) | [LinkedIn](https://www.linkedin.com/in/griffinbran/))

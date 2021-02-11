@@ -6,7 +6,6 @@
 ---
 ### Problem Statement
 >The existing autonomous vehicle market is dominated by multi-billion dollar companies such as Alphabet, Tesla, Ford etc. Perceived barriers to entry include high costs, access to data, and technicality. A market with only big companies will result in monopoly/oligopoly where a few companies get to decide the price of the product, not the supply and demand relation. Consumers suffer greatly from monopoly as they don't have other options.
-<br>
 >In an effort to prevent this situation from happening, we would like to build a self-driving car model from scratch based on convolutional neural networks to showcase that self-driving is not beyond reach for smaller companies, or even startups. In fact, it is possible to build a well-performing, self-driving car model with relatively little data, basic hardware requirements, and a straightforward workflow. By doing so, we hope to incentivize additional executive leadership to join the wave of self-driving rather than sit back and be the observants.
 
 #### **We will explore the following specific questions:**

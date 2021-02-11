@@ -233,4 +233,6 @@ Contact:
 > * Brandon Griffin ([Twitter](https://twitter.com/GriffinBran) | [LinkedIn](https://www.linkedin.com/in/griffinbran/))
 > * Anthony Clemens ([GitHub](https://git.generalassemb.ly/ajclemens) | [LinkedIn](https://www.linkedin.com/in/anthony-clemens/))
 
+[Back to Top](#back_to_top)
+
 ---
